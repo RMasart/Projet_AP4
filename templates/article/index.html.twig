@@ -21,7 +21,7 @@
                 <td>{{ article.nom }}</td>
                 <td>{{ article.disponibilite }}</td>
                 <td>
-                    <a href="{{ path('app_article_show', {'id': article.id}) }}">show</a>
+                    
                     <a href="{{ path('app_article_edit', {'id': article.id}) }}">edit</a>
                 </td>
             </tr>
@@ -30,8 +30,10 @@
                 <td colspan="4">no records found</td>
             </tr>
         {% endfor %}
+        
         </tbody>
     </table>
+<a href="{{ path('article_detail', { 'id': 1 }) }}" class="btn btn-info">Voir Article 1</a>
 
     <a href="{{ path('app_article_new') }}">Create new</a>
 {% endblock %}

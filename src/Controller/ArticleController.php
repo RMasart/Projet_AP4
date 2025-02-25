@@ -42,11 +42,17 @@ final class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_article_show', methods: ['GET'])]
-    public function show(Article $article): Response
+    #[Route('/article/{id}', name: 'article_detail')]
+    public function show(int $id, ArticleRepository $Article): Response
     {
+        $articles = $Article->find($id);
+
+        if(!isset($articles)) {
+            throw $this->createNotFoundException("l'article n'existe pas");
+        }
+
         return $this->render('article/show.html.twig', [
-            'article' => $article,
+            'article' => $articles,
         ]);
     }
 
@@ -78,4 +84,5 @@ final class ArticleController extends AbstractController
 
         return $this->redirectToRoute('app_article_index', [], Response::HTTP_SEE_OTHER);
     }
+    
 }
