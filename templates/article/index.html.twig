@@ -1,37 +1,46 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Article index{% endblock %}
+{% block title %}
+	All4Sport - Accueil
+{% endblock %}
 
 {% block body %}
-    <h1>Article index</h1>
+	<div>
+		<div class="d-flex justify-content-around align-items-center mt-3">
+			<div>
+				<nav class="navbar">
+					<div class="container-fluid">
+						<form class="d-flex" role="search">
+							<input class="form-control me-2 search-input" type="search" placeholder="Recherche" aria-label="Search">
+						</form>
+					</div>
+				</nav>
+			</div>
+			<div class="btn-group" role="group">
+				<input type="checkbox" class="btn-check" id="option1" checked autocomplete="off">
+				<label class="btn btn-secondary" for="option1">
+					<i class="fa-solid fa-check check-icon"></i>
+					Nouveauté
+				</label>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nom</th>
-                <th>Disponibilite</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for article in articles %}
-            <tr>
-                <td>{{ article.id }}</td>
-                <td>{{ article.nom }}</td>
-                <td>{{ article.disponibilite }}</td>
-                <td>
-                    <a href="{{ path('app_article_show', {'id': article.id}) }}">show</a>
-                    <a href="{{ path('app_article_edit', {'id': article.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+				<input type="radio" class="btn-check" id="option2" name="options" autocomplete="off">
+				<label class="btn btn-secondary" for="option2">
+					<i class="fa-solid fa-check check-icon"></i>
+					Prix Croissant
+				</label>
+				<input type="radio" class="btn-check" id="option3" name="options" autocomplete="off">
+				<label class="btn btn-secondary" for="option3">
+					<i class="fa-solid fa-check check-icon"></i>
+					Prix décroissant
+				</label>
+			</div>
+		</div>
+		<div>
+			{% for article in articles %}
 
-    <a href="{{ path('app_article_new') }}">Create new</a>
+				{% else %}
+					<p class="text-center">Aucun Article existant</p>
+			{% endfor %}
+		</div>
+	</div>
 {% endblock %}
