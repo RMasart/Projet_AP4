@@ -35,12 +35,22 @@
 				</label>
 			</div>
 		</div>
-		<div>
-			{% for article in articles %}
-
+		<div class="container mt-3">
+			<div class="row row-cols-2 row-cols-md-4 g-4">
+				{% for article in articles %}
+					<div class="col article_hover" onclick="window.location.href='{{ path('app_article_show', { 'id': article.id }) }}'">
+						<div class="card shadow-sm p-3">
+							<img src="{{ asset('images/all4sport.png') }}" alt="Article" class="card-img-top" width="250" height="250">
+							<div class="card-body">
+								<h5 class="card-title">{{ article.nom }}</h5>
+								<p class="card-text">0$</p>
+							</div>
+						</div>
+					</div>
 				{% else %}
-					<p class="text-center">Aucun Article existant</p>
-			{% endfor %}
+					<p class="text-center w-100">Aucun Article n'a été trouvé</p>
+				{% endfor %}
+			</div>
 		</div>
 	</div>
 {% endblock %}
