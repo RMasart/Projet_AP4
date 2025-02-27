@@ -38,7 +38,7 @@
 		<div class="container mt-3">
 			<div class="row row-cols-2 row-cols-md-4 g-4">
 				{% for article in articles %}
-					<div class="col article_hover" onclick="window.location.href='{{ path('app_article_show', { 'id': article.id }) }}'">
+					<div class="col article_hover" onclick="window.location.href='{{ path('article_detail', { 'id': article.id }) }}'">
 						<div class="card shadow-sm p-3">
 							<img src="{{ asset('images/all4sport.png') }}" alt="Article" class="card-img-top" width="250" height="250">
 							<div class="card-body">
