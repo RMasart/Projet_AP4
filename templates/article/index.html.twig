@@ -41,10 +41,17 @@
 				{% for article in articles %}
 					<div class="col article_hover" onclick="window.location.href='{{ path('article_detail', { 'id': article.id }) }}'">
 						<div class="card shadow-sm p-3">
-							<img src="{{ asset('images/all4sport.png') }}" alt="Article" class="card-img-top" width="250" height="250">
+							<!-- Affichage de l'image -->
+							{% if article.image %}
+								<img src="{{ asset('uploads/' ~ article.image) }}" alt="{{ article.nom }}" class="card-img-top" width="250" height="250">
+							{% else %}
+								<img src="{{ asset('images/default-product.jpg') }}" alt="Image par défaut" class="card-img-top" width="250" height="250">
+							{% endif %}
+
 							<div class="card-body">
 								<h5 class="card-title">{{ article.nom }}</h5>
-								<p class="card-text">0$</p>
+								<!-- Affichage du prix -->
+								<p class="card-text">{{ article.prix ? article.prix ~ ' €' : 'Prix non renseigné' }}</p>
 							</div>
 						</div>
 					</div>
