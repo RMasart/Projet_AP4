@@ -3,91 +3,37 @@
 {% block title %}{{ article.nom }}{% endblock %}
 
 {% block body %}
-<style>
-    body {
-        background-color: #dcdcdc;
-    }
-    .product-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-    }
-    .product-card {
-        display: flex;
-        align-items: center;
-        background: #e6e6e6;
-        padding: 30px;
-        border-radius: 10px;
-        width: 900px;
-        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
-    }
-    .product-image img {
-        width: 300px;
-        height: 300px;
-        object-fit: cover;
-        border: 2px solid #007bff;
-        border-radius: 10px;
-        background-color: #f8f9fa;
-    }
-    .product-details {
-        flex-grow: 1;
-    }
-    .product-logo {
-        display: block;
-        margin-left: auto;
-        margin-right: 0;
-        width: 120px;
-    }
-    .product-title {
-        margin-top: 10px;
-        font-size: 20px;
-    }
-    .product-info {
-        margin-top: 10px;
-        font-size: 16px;
-    }
-    .btn-add-cart {
-        background-color: red;
-        color: white;
-        border: none;
-        padding: 10px 25px;
-        border-radius: 30px;
-        font-size: 16px;
-        margin-top: 20px;
-        cursor: pointer;
-    }
-    .btn-add-cart:hover {
-        background-color: darkred;
-    }
-</style>
 
-<div class="product-container">
-    <div class="product-image">
-    {% if article.image %}
-        <img src="{{ asset('uploads/' ~ article.image) }}" alt="{{ article.nom }}">
-    {% else %}
-        <img src="{{ asset('images/default-product.jpg') }}" alt="Image par défaut">
-    {% endif %}
-</div>
-
-<p><strong>Prix :</strong> {{ article.prix ? article.prix ~ ' €' : 'Non renseigné' }}</p>
-<p><strong>Disponible :</strong> {{ article.disponibilite ? 'Oui' : 'Non' }}</p>
-
-
-        <!-- Détails du produit -->
-        <div class="product-details">
-            <img src="{{ asset('images/all4sport.png') }}" alt="Logo All4Sport" class="product-logo">
-            <h3 class="product-title">Détail du produit :</h3>
-            <div class="product-info">
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="row product-card w-75">
+        <div class="col-md-5 text-center">
+            <div class="product-image">
+                {% if article.image %}
+                    <img src="{{ asset('uploads/' ~ article.image) }}" alt="{{ article.nom }}">
+                {% else %}
+                    <img src="{{ asset('images/default-product.jpg') }}" alt="Image par défaut">
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-7 d-flex flex-column justify-content-between">
+            <div>
+                <img src="{{ asset('images/all4sport.png') }}" alt="Logo All4Sport" class="product-logo">
+                <h3 class="product-title">Détail du produit :</h3>
                 <p><strong>Nom :</strong> {{ article.nom }}</p>
                 <p><strong>Disponible :</strong> {{ article.disponibilite ? 'Oui' : 'Non' }}</p>
                 <hr>
-                <p><strong>Prix :</strong> {{ article.prix }} €</p>
+                <p><strong>Prix :</strong> {{ article.prix ? article.prix ~ ' €' : 'Non renseigné' }}</p>
             </div>
 
-            <!-- Bouton Ajouter au panier -->
-            <button class="btn-add-cart" data-id="{{ article.id }}">Ajouter au panier</button>
+            <!-- Boutons "Retour à l'accueil" et "Ajouter au panier" -->
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{{ path('app_article_index') }}" class="btn btn-secondary">
+                    ⬅ Retour à l'accueil
+                </a>
+                <button class="btn-add-cart btn btn-primary" data-id="{{ article.id }}">
+                    🛒 Ajouter au panier
+                </button>
+            </div>
         </div>
     </div>
 </div>
