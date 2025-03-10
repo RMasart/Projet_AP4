@@ -23,48 +23,67 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('/article/new', name: 'app_article_new', methods: ['GET', 'POST'])]
-public function new(Request $request, EntityManagerInterface $entityManager): Response
-{
-    $article = new Article();
-    $form = $this->createForm(ArticleType::class, $article);
-    $form->handleRequest($request);
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $article = new Article();
+        $form = $this->createForm(ArticleType::class, $article);
+        $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        /** @var UploadedFile $imageFile */
-        $imageFile = $form->get('image')->getData();
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
 
-        if ($imageFile) {
-            $newFilename = uniqid().'.'.$imageFile->guessExtension();
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
 
-            try {
-                $imageFile->move(
-                    $this->getParameter('upload_directory'), // Défini dans services.yaml
-                    $newFilename
-                );
-                $article->setImage($newFilename);
-            } catch (FileException $e) {
-                // Gérer l'erreur si nécessaire
+                try {
+                    $imageFile->move(
+                        $this->getParameter('upload_directory'), // Défini dans services.yaml
+                        $newFilename
+                    );
+                    $article->setImage($newFilename);
+                } catch (FileException $e) {
+                    // Gérer l'erreur si nécessaire
+                }
             }
+
+            $entityManager->persist($article);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_article_index');
         }
 
-        $entityManager->persist($article);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('app_article_index');
+        return $this->render('article/new.html.twig', [
+            'article' => $article,
+            'form' => $form,
+        ]);
     }
 
-    return $this->render('article/new.html.twig', [
-        'article' => $article,
-        'form' => $form,
-    ]);
-}
+    #[Route('/article/search', 'app_search_article', methods: ['POST'])]
+    public function searchArticle(ArticleRepository $article, Request $request): Response
+    {
 
-    #[Route('/article/{id}', name: 'article_detail')]
+        $query = $request->request->get('s', '');
+
+        if (empty($query)) {
+            return $this->redirectToRoute('app_article_index');
+        }
+
+        $articles = $article->searchByQuery($query);
+
+        return $this->render('article/search.html.twig', [
+            'articles' => $articles,
+            'query' => $query,
+        ]);
+
+    }
+
+    #[Route('/article/g/{id}', name: 'article_detail')]
     public function show(int $id, ArticleRepository $Article): Response
     {
         $articles = $Article->find($id);
 
-        if(!isset($articles)) {
+        if (!isset($articles)) {
             throw $this->createNotFoundException("l'article n'existe pas");
         }
 
@@ -101,5 +120,5 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
 
         return $this->redirectToRoute('app_article_index', [], Response::HTTP_SEE_OTHER);
     }
-    
+
 }
