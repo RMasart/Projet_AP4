@@ -31,7 +31,15 @@ final class ArticleController extends AbstractController
         $article = new Article();
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $article = new Article();
+        $form = $this->createForm(ArticleType::class, $article);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
         if ($form->isSubmitted() && $form->isValid()) {
             // 🔹 Gestion de l'image
             /** @var UploadedFile $imageFile */
@@ -39,7 +47,19 @@ final class ArticleController extends AbstractController
 
             if ($imageFile) {
                 $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+            if ($imageFile) {
+                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
 
+                try {
+                    $imageFile->move(
+                        $this->getParameter('upload_directory'), // Défini dans services.yaml
+                        $newFilename
+                    );
+                    $article->setImage($newFilename);
+                } catch (FileException $e) {
+                    // Gérer l'erreur si nécessaire
+                }
+            }
                 try {
                     $imageFile->move(
                         $this->getParameter('upload_directory'),
@@ -51,6 +71,8 @@ final class ArticleController extends AbstractController
                 }
             }
 
+            $entityManager->persist($article);
+            $entityManager->flush();
             $entityManager->persist($article);
             $entityManager->flush();
 
@@ -68,19 +90,45 @@ final class ArticleController extends AbstractController
 
             return $this->redirectToRoute('app_article_index');
         }
+            return $this->redirectToRoute('app_article_index');
+        }
 
         return $this->render('article/new.html.twig', [
             'article' => $article,
             'form' => $form,
         ]);
     }
+        return $this->render('article/new.html.twig', [
+            'article' => $article,
+            'form' => $form,
+        ]);
+    }
 
-    #[Route('/article/{id}', name: 'article_detail', methods: ['GET'])]
-    public function show(int $id, ArticleRepository $articleRepository, StockerRepository $stockerRepository): Response
+    #[Route('/article/search', 'app_search_article', methods: ['POST'])]
+    public function searchArticle(ArticleRepository $article, Request $request): Response
+    {
+
+        $query = $request->request->get('s', '');
+
+        if (empty($query)) {
+            return $this->redirectToRoute('app_article_index');
+        }
+
+        $articles = $article->searchByQuery($query);
+
+        return $this->render('article/search.html.twig', [
+            'articles' => $articles,
+            'query' => $query,
+        ]);
+
+    }
+
+    #[Route('/article/g/{id}', name: 'article_detail')]
+    public function show(int $id, ArticleRepository $Article): Response
     {
         $article = $articleRepository->find($id);
 
-        if (!$article) {
+        if  (!$article) {
             throw $this->createNotFoundException("L'article n'existe pas.");
         }
 
@@ -167,4 +215,5 @@ final class ArticleController extends AbstractController
 
         return $this->redirectToRoute('app_article_index', [], Response::HTTP_SEE_OTHER);
     }
+
 }
