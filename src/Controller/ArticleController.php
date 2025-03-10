@@ -83,34 +83,9 @@ final class ArticleController extends AbstractController
     }
 
     #[Route('/article/g/{id}', name: 'article_detail')]
-    public function show(int $id, ArticleRepository $Article): Response
-
-            // 🔹 Gestion de la quantité
-            $quantite = $form->get('quantite')->getData();
-            if ($quantite > 0) {
-                $stocker = new Stocker();
-                $stocker->setArticle($article);
-                $stocker->setQuantite($quantite);
-                $stocker->setEntrepotId(1); // À adapter selon la logique métier
-
-                $entityManager->persist($stocker);
-                $entityManager->flush();
-            }
-
-            return $this->redirectToRoute('app_article_index');
-        }
-
-        return $this->render('article/new.html.twig', [
-            'article' => $article,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/article/{id}', name: 'article_detail', methods: ['GET'])]
-    public function show(int $id, ArticleRepository $articleRepository, StockerRepository $stockerRepository): Response
-      
+    public function show(int $id, ArticleRepository $Article, StockerRepository $stockerRepository): Response
     {
-        $article = $articleRepository->find($id);
+        $article = $Article->find($id);
 
         if (!isset($articles)) {
             throw $this->createNotFoundException("l'article n'existe pas");
@@ -126,11 +101,21 @@ final class ArticleController extends AbstractController
         ]);
     }
 
+    #[Route('/article/edit/{id}', name: 'app_article_edit', methods: ['GET', 'POST'])]
+    public function edit(
+        Request $request,
+        Article $article,
+        EntityManagerInterface $entityManager,
+        StockerRepository $stockerRepository
+    ): Response {
+        // 🔹 Récupérer la quantité existante
+        $stock = $stockerRepository->findOneBy(['article' => $article]);
+        $quantite = $stock ? $stock->getQuantite() : 0;
 
-    #[Route('/article/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Article $article, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(ArticleType::class, $article);
+        // 🔹 Ajouter la quantité au formulaire
+        $form = $this->createForm(ArticleType::class, $article, [
+            'quantite' => $quantite,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -176,7 +161,6 @@ final class ArticleController extends AbstractController
             'quantite' => $quantite,
         ]);
     }
-
 
     #[Route('/article/delete/{id}', name: 'app_article_delete', methods: ['POST'])]
     public function delete(Request $request, Article $article, EntityManagerInterface $entityManager): Response
