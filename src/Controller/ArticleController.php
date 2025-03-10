@@ -33,7 +33,7 @@ final class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // 🔹 Gestion de l'image
+
             /** @var UploadedFile $imageFile */
             $imageFile = $form->get('image')->getData();
 
@@ -53,6 +53,37 @@ final class ArticleController extends AbstractController
 
             $entityManager->persist($article);
             $entityManager->flush();
+
+            return $this->redirectToRoute('app_article_index');
+        }
+
+        return $this->render('article/new.html.twig', [
+            'article' => $article,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/article/search', 'app_search_article', methods: ['POST'])]
+    public function searchArticle(ArticleRepository $article, Request $request): Response
+    {
+
+        $query = $request->request->get('s', '');
+
+        if (empty($query)) {
+            return $this->redirectToRoute('app_article_index');
+        }
+
+        $articles = $article->searchByQuery($query);
+
+        return $this->render('article/search.html.twig', [
+            'articles' => $articles,
+            'query' => $query,
+        ]);
+
+    }
+
+    #[Route('/article/g/{id}', name: 'article_detail')]
+    public function show(int $id, ArticleRepository $Article): Response
 
             // 🔹 Gestion de la quantité
             $quantite = $form->get('quantite')->getData();
@@ -77,11 +108,12 @@ final class ArticleController extends AbstractController
 
     #[Route('/article/{id}', name: 'article_detail', methods: ['GET'])]
     public function show(int $id, ArticleRepository $articleRepository, StockerRepository $stockerRepository): Response
+      
     {
         $article = $articleRepository->find($id);
 
-        if (!$article) {
-            throw $this->createNotFoundException("L'article n'existe pas.");
+        if (!isset($articles)) {
+            throw $this->createNotFoundException("l'article n'existe pas");
         }
 
         // 🔹 Récupérer la quantité en stock

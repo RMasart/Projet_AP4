@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+	<div class="d-flex justify-content-around align-items-center mt-3">
+		<div>
+			<nav class="navbar">
+				<div class="container-fluid">
+					<form class="d-flex search-form" role="search" action="{{ path('app_search_article') }}" method="post">
+						<div class="search-container">
+							<input class="form-control search-input" name="s" type="search" placeholder="Recherche" aria-label="Search" value="{{ query ?? '' }}">
+							<button class="search-btn" type="submit">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewbox="0 0 16 16">
+									<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+								</svg>
+							</button>
+						</div>
+					</form>
+				</div>
+			</nav>
+		</div>
+		<div class="btn-group" role="group">
+			<input type="checkbox" class="btn-check" id="option1" checked autocomplete="off">
+			<label class="btn btn-secondary" for="option1">
+				<i class="fa-solid fa-check check-icon"></i>
+				Nouveauté
+			</label>
+
+			<input type="radio" class="btn-check" id="option2" name="options" autocomplete="off">
+			<label class="btn btn-secondary" for="option2">
+				<i class="fa-solid fa-check check-icon"></i>
+				Prix Croissant
+			</label>
+			<input type="radio" class="btn-check" id="option3" name="options" autocomplete="off">
+			<label class="btn btn-secondary" for="option3">
+				<i class="fa-solid fa-check check-icon"></i>
+				Prix décroissant
+			</label>
+		</div>
+	</div>
+	<div class="container mt-3">
+		<div class="row row-cols-2 row-cols-md-4 g-4">
+			{% for article in articles %}
+				<div class="col article_hover" onclick="window.location.href='{{ path('article_detail', { 'id': article.id }) }}'">
+					<div class="card shadow-sm p-3">
+						{% if article.image %}
+							<img src="{{ asset('uploads/' ~ article.image) }}" alt="{{ article.nom }}" class="card-img-top" width="250" height="250">
+						{% else %}
+							<img src="{{ asset('images/default-product.jpg') }}" alt="Image par défaut" class="card-img-top" width="250" height="250">
+						{% endif %}
+
+						<div class="card-body">
+							<h5 class="card-title">{{ article.nom }}</h5>
+							<p class="card-text">{{ article.prix ? article.prix ~ '€' : 'Prix non renseigné' }}</p>
+						</div>
+					</div>
+				</div>
+			{% else %}
+				<p class="text-center w-100">Aucun Article n'a été trouvé</p>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}
