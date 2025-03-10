@@ -1,0 +1,86 @@
+{# templates/registration/register.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}S'enregistrer{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">S'enregistrer</h2>
+                    
+                    {{ form_start(registrationForm, {
+                        'attr': {
+                            'class': 'needs-validation',
+                            'novalidate': 'novalidate'
+                        }
+                    }) }}
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.nom) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.prenom) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.email, 'Email', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.email) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.adresse, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.adresse) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(registrationForm.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.telephone, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.telephone) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(registrationForm.password, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(registrationForm.password, {'attr': {'class': 'form-control'}}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(registrationForm.password) }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-dark w-100 py-2 mb-3">
+                        Confirmer
+                    </button>
+
+                    <div class="text-center">
+                        <a href="#" class="text-muted text-decoration-none">
+                            Besoin d'aide ?
+                        </a>
+                    </div>
+
+                    {{ form_end(registrationForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
