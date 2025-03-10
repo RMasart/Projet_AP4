@@ -3,7 +3,6 @@
 {% block title %}Panier{% endblock %}
 
 {% block body %}
-
 <style>
 .article {
     display: flex;
@@ -13,6 +12,7 @@
     border-radius: 10px;
     margin: 5px 0;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
 }
 
 .article-info {
@@ -36,18 +36,17 @@
 </style>
 
 <div class="articles">
-    {% for produit in produits %}
-        <div class="article">
-            <input type="checkbox" name="produits[]" value="{{ produit.prix }}" {% if not produit.disponible %}disabled{% endif %}>
+    {% for article in articles %}
+        <div class="article" id="article-{{ article.id }}">
+            <input type="checkbox" name="produits[]" value="{{ article.prix }}" {% if not article.disponible %}disabled{% endif %}>
             <div class="article-info">
-                <span class="nom-produit">{{ produit.nom }}</span>
-                <span class="{% if produit.disponible %}en-stock{% else %}indisponible{% endif %}">
-                    {{ produit.disponible ? 'En stock' : 'Indisponible' }}
+                <span class="nom-produit">{{ article.nom }}</span>
+                <span class="{% if article.disponible %}en-stock{% else %}indisponible{% endif %}">
+                    {{ article.disponible ? 'En stock' : 'Indisponible' }}
                 </span>
-                <span class="quantite">
-                    <input type="number" value="0" min="0" data-article-id="{{ produit.id }}">
-                </span>
+                <input type="number" value="0" min="0" data-article-id="{{ article.id }}" disabled>
             </div>
+            <button class="btn-supprimer" data-article-id="{{ article.id }}">🗑</button>
         </div>
     {% endfor %}
 </div>
@@ -62,5 +61,6 @@
 </div>
 
 <script src="{{ asset('js/script.js') }}"></script>
+
 
 {% endblock %}
