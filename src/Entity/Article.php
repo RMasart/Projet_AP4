@@ -2,6 +2,8 @@
 namespace App\Entity;
 
 use App\Repository\ArticleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
@@ -18,11 +20,19 @@ class Article
     #[ORM\Column(type: 'boolean')] 
     private ?bool $disponibilite = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)] // Ajout du prix
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)] 
     private ?float $prix = null;
 
-    #[ORM\Column(length: 255, nullable: true)] // Ajout de l'image
+    #[ORM\Column(length: 255, nullable: true)] 
     private ?string $image = null;
+
+    #[ORM\OneToMany(targetEntity: Stocker::class, mappedBy: 'article')]
+    private Collection $stockers;
+
+    public function __construct()
+    {
+        $this->stockers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -40,7 +50,7 @@ class Article
         return $this;
     }
 
-    public function isDisponibilite(): ?bool // Correction du getter pour un booléen
+    public function isDisponibilite(): ?bool 
     {
         return $this->disponibilite;
     }
@@ -70,6 +80,20 @@ class Article
     public function setImage(?string $image): static
     {
         $this->image = $image;
+        return $this;
+    }
+
+    public function getStockers(): Collection
+    {
+        return $this->stockers;
+    }
+
+    public function addStocker(Stocker $stocker): static
+    {
+        if (!$this->stockers->contains($stocker)) {
+            $this->stockers->add($stocker);
+            $stocker->setArticle($this);
+        }
         return $this;
     }
 }
