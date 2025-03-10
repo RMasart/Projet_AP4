@@ -127,8 +127,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->prenom = $prenom;
 
+
         return $this;
     }
+
 
     public function getNom(): ?string
     {
@@ -138,6 +140,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
 
         return $this;
     }

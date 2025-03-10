@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Merci pour votre commande{% endblock %}
+
+{% block body %}
+    <div class="container text-center mt-5">
+        <h1 class="text-success">Merci pour votre commande !</h1>
+        <p>Nous avons bien reçu votre commande et nous la préparons avec soin.</p>
+        <a href="{{ path('app_article_index') }}" class="btn btn-primary mt-3">Retour à l'accueil</a>
+    </div>
+{% endblock %}
