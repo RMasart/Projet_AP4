@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique d'achat{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h2 class="text-center mt-4">Historique d'achat</h2>
+    <div class="row">
+        {% for commande in commandes %}
+        <div class="col-md-3">
+            <div class="card">
+                <img src="{{ commande.article.image }}" class="card-img-top" alt="{{ commande.article.nom }}">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ commande.article.nom }}</h5>
+                    <p class="card-text"><strong>{{ commande.prix }} €</strong></p>
+                    <p class="card-text">Acheté le : {{ commande.dateCommande|date('d/m/Y') }}</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-center">Aucune commande passée.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
