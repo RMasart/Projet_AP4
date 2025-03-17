@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 final class MonPanierController extends AbstractController
 {
@@ -44,5 +45,18 @@ final class MonPanierController extends AbstractController
     public function confirm(): Response
     {
         return $this->redirectToRoute('app_confirmation_panier');
+    }
+
+    #[Route('/panier', name: 'panier')]
+    public function panier(Request $request): Response
+    {
+        $produits = $request->request->get('produits', null);
+        $quantites = $request->request->get('quantites', null);
+
+
+        return $this->render('panier/index.html.twig', [
+            'produits' => $produits,
+            'quantites' => $quantites,
+        ]);
     }
 }

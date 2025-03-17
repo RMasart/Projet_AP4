@@ -1,39 +1,38 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Panier
-{% endblock %}
+{% block title %}Panier{% endblock %}
 
 {% block body %}
-	<div class="articles">
-		{% for article in articles %}
-			<div class="article" id="article-{{ article.id }}">
-				<input type="checkbox" name="produits[]" value="{{ article.prix }}" {% if not article.disponible %} disabled {% endif %}>
-				<div class="article-info">
-					<span class="nom-produit">{{ article.nom }}</span>
-					<span class="{% if article.disponible %}en-stock{% else %}indisponible{% endif %}">
-						{{ article.disponible ? 'En stock' : 'Indisponible' }}
-					</span>
-					<input type="number" value="0" min="0" data-article-id="{{ article.id }}" disabled>
-				</div>
-				<button class="btn-supprimer" data-article-id="{{ article.id }}">🗑</button>
-			</div>
-		{% endfor %}
-	</div>
+    <form action="/panier" method="post">
+        <div class="articles">
+            {% for article in articles %}
+                <div class="article" id="article-{{ article.id }}">
+                    <input type="checkbox" name="produits[]" value="{{ article.id }}" {% if not article.disponible %} disabled {% endif %}>
+                    <div class="article-info">
+                        <span class="nom-produit">{{ article.nom }}</span>
+                        <span class="{% if article.disponible %}en-stock{% else %}indisponible{% endif %}">
+                            {{ article.disponible ? 'En stock' : 'Indisponible' }}
+                        </span>
+                        <input type="number" name="quantites[{{ article.id }}]" value="0" min="0" data-article-id="{{ article.id }}" disabled>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit">Ajouter au panier</button>
+    </form>
 
-	<div class="total" style="margin-top: 20px;">
-		<p>Nombre d'articles :
-			<span id="nombre-articles">0</span>
-		</p>
-		<p>Total :
-			<span id="total">0</span>
-			€</p>
-	</div>
+    <div class="total" style="margin-top: 20px;">
+        <p>Nombre d'articles :
+            <span id="nombre-articles">0</span>
+        </p>
+        <p>Total :
+            <span id="total">0</span>
+            €</p>
+    </div>
 
-	<div style="text-align: center; margin-top: 20px;">
-		<a href="{{ path('app_confirmation_panier') }}" class="btn btn-success">PAYER</a>
-	</div>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ path('app_confirmation_panier') }}" class="btn btn-success">PAYER</a>
+    </div>
 
-	<script src="{{ asset('js/script.js') }}"></script>
-
-
+    <script src="{{ asset('js/script.js') }}"></script>
 {% endblock %}
