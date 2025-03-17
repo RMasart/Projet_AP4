@@ -87,7 +87,7 @@ final class ArticleController extends AbstractController
     {
         $article = $Article->find($id);
 
-        if (!isset($articles)) {
+        if (!$article) {
             throw $this->createNotFoundException("l'article n'existe pas");
         }
 
