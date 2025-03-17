@@ -17,6 +17,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class ArticleController extends AbstractController
 {
+    #[Route('/article/admin', name: 'app_article_admin_index', methods: ['GET'])]
+    public function indexadmin(ArticleRepository $articleRepository): Response
+    {
+        return $this->render('article/articleadmin.html.twig', [
+            'articles' => $articleRepository->findAll(),
+        ]);
+    }
+
+
     #[Route('/', name: 'app_article_index', methods: ['GET'])]
     public function index(ArticleRepository $articleRepository): Response
     {
@@ -31,15 +40,7 @@ final class ArticleController extends AbstractController
         $article = new Article();
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $article = new Article();
-        $form = $this->createForm(ArticleType::class, $article);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $imageFile */
-            $imageFile = $form->get('image')->getData();
         if ($form->isSubmitted() && $form->isValid()) {
             // 🔹 Gestion de l'image
             /** @var UploadedFile $imageFile */
@@ -47,19 +48,7 @@ final class ArticleController extends AbstractController
 
             if ($imageFile) {
                 $newFilename = uniqid() . '.' . $imageFile->guessExtension();
-            if ($imageFile) {
-                $newFilename = uniqid() . '.' . $imageFile->guessExtension();
 
-                try {
-                    $imageFile->move(
-                        $this->getParameter('upload_directory'), // Défini dans services.yaml
-                        $newFilename
-                    );
-                    $article->setImage($newFilename);
-                } catch (FileException $e) {
-                    // Gérer l'erreur si nécessaire
-                }
-            }
                 try {
                     $imageFile->move(
                         $this->getParameter('upload_directory'),
@@ -71,8 +60,6 @@ final class ArticleController extends AbstractController
                 }
             }
 
-            $entityManager->persist($article);
-            $entityManager->flush();
             $entityManager->persist($article);
             $entityManager->flush();
 
@@ -90,14 +77,7 @@ final class ArticleController extends AbstractController
 
             return $this->redirectToRoute('app_article_index');
         }
-            return $this->redirectToRoute('app_article_index');
-        }
 
-        return $this->render('article/new.html.twig', [
-            'article' => $article,
-            'form' => $form,
-        ]);
-    }
         return $this->render('article/new.html.twig', [
             'article' => $article,
             'form' => $form,
@@ -120,22 +100,20 @@ final class ArticleController extends AbstractController
             'articles' => $articles,
             'query' => $query,
         ]);
-
     }
 
     #[Route('/article/g/{id}', name: 'article_detail')]
-    public function show(int $id, ArticleRepository $Article): Response
+    public function show(int $id, ArticleRepository $Article, StockerRepository $stockerRepository): Response
     {
-        $article = $articleRepository->find($id);
+        $article = $Article->find($id);
 
-        if  (!$article) {
+        if (!$article) {
             throw $this->createNotFoundException("L'article n'existe pas.");
         }
 
         // 🔹 Récupérer la quantité en stock
         $stock = $stockerRepository->findOneBy(['article' => $article]);
         $quantite = $stock ? $stock->getQuantite() : 0; // Par défaut, 0 si non trouvé
-
         return $this->render('article/show.html.twig', [
             'article' => $article,
             'quantite' => $quantite, // Passer la quantité au template
@@ -215,5 +193,4 @@ final class ArticleController extends AbstractController
 
         return $this->redirectToRoute('app_article_index', [], Response::HTTP_SEE_OTHER);
     }
-
 }
