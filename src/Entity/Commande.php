@@ -26,6 +26,12 @@ class Commande
     #[ORM\ManyToOne(inversedBy: 'commandes')]
     private ?Etat $etat = null;
 
+    #[ORM\Column]
+    private ?int $quantite = null;
+
+    #[ORM\ManyToOne(inversedBy: 'commandes')]
+    private ?user $utilisateur = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +81,30 @@ class Commande
     public function setEtat(?Etat $etat): static
     {
         $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function getQuantite(): ?int
+    {
+        return $this->quantite;
+    }
+
+    public function setQuantite(int $quantite): static
+    {
+        $this->quantite = $quantite;
+
+        return $this;
+    }
+
+    public function getUtilisateur(): ?user
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?user $utilisateur): static
+    {
+        $this->utilisateur = $utilisateur;
 
         return $this;
     }
