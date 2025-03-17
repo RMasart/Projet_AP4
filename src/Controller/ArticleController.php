@@ -17,6 +17,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class ArticleController extends AbstractController
 {
+    #[Route('/article/admin', name: 'app_article_admin_index', methods: ['GET'])]
+    public function indexadmin(ArticleRepository $articleRepository): Response
+    {
+        return $this->render('article/articleadmin.html.twig', [
+            'articles' => $articleRepository->findAll(),
+        ]);
+    }
+
+
     #[Route('/', name: 'app_article_index', methods: ['GET'])]
     public function index(ArticleRepository $articleRepository): Response
     {
@@ -33,7 +42,7 @@ final class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
+            // 🔹 Gestion de l'image
             /** @var UploadedFile $imageFile */
             $imageFile = $form->get('image')->getData();
 
@@ -53,6 +62,18 @@ final class ArticleController extends AbstractController
 
             $entityManager->persist($article);
             $entityManager->flush();
+
+            // 🔹 Gestion de la quantité
+            $quantite = $form->get('quantite')->getData();
+            if ($quantite > 0) {
+                $stocker = new Stocker();
+                $stocker->setArticle($article);
+                $stocker->setQuantite($quantite);
+                $stocker->setEntrepotId(1); // À adapter selon la logique métier
+
+                $entityManager->persist($stocker);
+                $entityManager->flush();
+            }
 
             return $this->redirectToRoute('app_article_index');
         }
@@ -79,7 +100,6 @@ final class ArticleController extends AbstractController
             'articles' => $articles,
             'query' => $query,
         ]);
-
     }
 
     #[Route('/article/g/{id}', name: 'article_detail')]
@@ -87,21 +107,21 @@ final class ArticleController extends AbstractController
     {
         $article = $Article->find($id);
 
-        if (!isset($articles)) {
-            throw $this->createNotFoundException("l'article n'existe pas");
+        if (!$article) {
+            throw $this->createNotFoundException("L'article n'existe pas.");
         }
 
         // 🔹 Récupérer la quantité en stock
         $stock = $stockerRepository->findOneBy(['article' => $article]);
         $quantite = $stock ? $stock->getQuantite() : 0; // Par défaut, 0 si non trouvé
-
         return $this->render('article/show.html.twig', [
             'article' => $article,
             'quantite' => $quantite, // Passer la quantité au template
         ]);
     }
 
-    #[Route('/article/edit/{id}', name: 'app_article_edit', methods: ['GET', 'POST'])]
+
+    #[Route('/article/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Article $article,
@@ -161,6 +181,7 @@ final class ArticleController extends AbstractController
             'quantite' => $quantite,
         ]);
     }
+
 
     #[Route('/article/delete/{id}', name: 'app_article_delete', methods: ['POST'])]
     public function delete(Request $request, Article $article, EntityManagerInterface $entityManager): Response
