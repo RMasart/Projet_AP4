@@ -34,32 +34,34 @@
 					<img src="{{ asset('images/all4sport.png') }}" alt="Bootstrap" width="80" height="80">
 				</a>
 				<div class="d-flex align-items-center nav-right">
-					<button class="btn btn-sm btn-outline-secondary me-3" type="button">S'enregistrer</button>
-					<button class="btn btn-sm btn-outline-secondary me-3" type="button" onclick="window.location.href='{{ path('app_login') }}'">Se Connecter</button>
 
-					<button class="btn btn-sm btn-outline-secondary me-3" type="button">Mon Panier</button>
+					{% if not app.user %}
+						<button class="btn btn-sm btn-outline-secondary me-3" type="button" onclick="window.location.href='{{ path('app_register') }}'">S'enregistrer</button>
+						<button class="btn btn-sm btn-outline-secondary me-3" type="button" onclick="window.location.href='{{ path('app_login') }}'">Se Connecter</button>
+					{% endif %}
+
+					{% if app.user %}
+						<button class="btn btn-sm btn-outline-secondary me-3" type="button" onclick="window.location.href='{{path('app_mon_panier')}}'">Mon Panier</button>
+					{% endif %}
 
 					<div class="dropdown">
 						<a href="#" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
 							<img class="img-fluid bg-dark rounded-circle profile_ico" src="{{ asset('images/profil_ico.jpeg') }}" alt="logo" width="40" height="40">
 						</a>
-
-						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-							<li>
-								<a class="dropdown-item" href={{path('app_client')}}>Profil</a>
-
-							</li>
-							<li>
-								<a class="dropdown-item" href="#">Paramètres</a>
-							</li>
-							<li>
-								<a class="dropdown-item" href="#">Vos Commandes</a>
-							</li>
-							<li><hr class="dropdown-divider"></li>
-							<li>
-								<a class="btn btn-danger dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
-							</li>
-						</ul>
+						{% if app.user %}
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+								<li>
+									<a class="dropdown-item" href={{path('app_client')}}>Profil</a>
+								</li>
+								<li>
+									<a class="dropdown-item" href={{path('historique')}}>Historiques</a>
+								</li>
+								<li><hr class="dropdown-divider"></li>
+								<li>
+									<a class="btn btn-danger dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
+								</li>
+							</ul>
+						{% endif %}
 					</div>
 				</div>
 			</div>
