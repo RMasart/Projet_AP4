@@ -108,7 +108,7 @@ final class ArticleController extends AbstractController
         $article = $Article->find($id);
 
         if (!$article) {
-            throw $this->createNotFoundException("L'article n'existe pas.");
+            throw $this->createNotFoundException("l'article n'existe pas");
         }
 
         // 🔹 Récupérer la quantité en stock
