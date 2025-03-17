@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints\File;
 
 class ArticleType extends AbstractType
@@ -28,7 +29,7 @@ class ArticleType extends AbstractType
             ])
             ->add('nom')
             ->add('disponibilite')
-            ->add('prix')
+            ->add('prix', NumberType::class)
             ->add('quantite', null, [
                 'mapped' => false,
                 'label' => 'Quantité en stock',
