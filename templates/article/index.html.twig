@@ -11,8 +11,15 @@
 			<div>
 				<nav class="navbar">
 					<div class="container-fluid">
-						<form class="d-flex" role="search">
-							<input class="form-control me-2 search-input" type="search" placeholder="Recherche" aria-label="Search">
+						<form class="d-flex search-form" role="search" action="{{ path('app_search_article') }}" method="post">
+							<div class="search-container">
+								<input class="form-control search-input" name="s" type="search" placeholder="Recherche" aria-label="Search" value="{{ query ?? '' }}">
+								<button class="search-btn" type="submit">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewbox="0 0 16 16">
+										<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+									</svg>
+								</button>
+							</div>
 						</form>
 					</div>
 				</nav>
@@ -40,7 +47,8 @@
 			<div class="row row-cols-2 row-cols-md-4 g-4">
 				{% for article in articles %}
 					<div class="col article_hover" onclick="window.location.href='{{ path('article_detail', { 'id': article.id }) }}'">
-						<div class="card shadow-sm p-3">
+						<div
+							class="card shadow-sm p-3">
 							<!-- Affichage de l'image -->
 							{% if article.image %}
 								<img src="{{ asset('uploads/' ~ article.image) }}" alt="{{ article.nom }}" class="card-img-top" width="250" height="250">
@@ -51,7 +59,7 @@
 							<div class="card-body">
 								<h5 class="card-title">{{ article.nom }}</h5>
 								<!-- Affichage du prix -->
-								<p class="card-text">{{ article.prix ? article.prix ~ ' €' : 'Prix non renseigné' }}</p>
+								<p class="card-text">{{ article.prix ? article.prix ~ '€' : 'Prix non renseigné' }}</p>
 							</div>
 						</div>
 					</div>
