@@ -38,23 +38,26 @@
 							<div class="border p-3 rounded bg-light shadow-sm mb-3">
 								<p>
 									<strong>Nom</strong><br>
-									John Doe</p>
+									{{ app.user.nom | default('Aucune Nom mis') }}
+								</p>
+								<p>
+									<strong>Prénom</strong><br>
+									{{app.user.prenom | default('Aucun Prénom mis')}}
+								</p>
 								<p>
 									<strong>Email</strong><br>
-									john.doe@example.com</p>
-								<p>
-									<strong>Date de Naissance</strong><br>
-									<input type="date" disabled></p>
+									{{ app.user.email | default('') }}
+								</p>
 							</div>
 						</div>
 						<div id="other-info-content" class="section-content d-none">
 							<div class="border p-3 rounded bg-light shadow-sm mb-3">
 								<p>
 									<strong>Adresse :</strong>
-									123 Rue Exemple, Paris</p>
+									{{app.user.adresse}}</p>
 								<p>
 									<strong>Téléphone :</strong>
-									0123456789</p>
+									{{app.user.telephone}}</p>
 							</div>
 						</div>
 					</div>
