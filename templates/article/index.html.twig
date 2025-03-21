@@ -24,25 +24,37 @@
 					</div>
 				</nav>
 			</div>
-			<div class="btn-group" role="group">
-				<input type="checkbox" class="btn-check" id="option1" checked autocomplete="off">
-				<label class="btn btn-secondary" for="option1">
-					<i class="fa-solid fa-check check-icon"></i>
-					Nouveauté
-				</label>
+			<form id="filterForm" method="get" action="{{ path('app_article_filtered') }}">
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Trier par
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+            <li>
+                <button class="dropdown-item filter-option" type="button" data-value="asc">Prix Croissant</button>
+            </li>
+            <li>
+                <button class="dropdown-item filter-option" type="button" data-value="desc">Prix Décroissant</button>
+            </li>
+        </ul>
+        <input type="hidden" name="filter" id="filterInput">
+    </div>
+</form>
 
-				<input type="radio" class="btn-check" id="option2" name="options" autocomplete="off">
-				<label class="btn btn-secondary" for="option2">
-					<i class="fa-solid fa-check check-icon"></i>
-					Prix Croissant
-				</label>
-				<input type="radio" class="btn-check" id="option3" name="options" autocomplete="off">
-				<label class="btn btn-secondary" for="option3">
-					<i class="fa-solid fa-check check-icon"></i>
-					Prix décroissant
-				</label>
-			</div>
-		</div>
+<script>
+    document.querySelectorAll('.filter-option').forEach(item => {
+        item.addEventListener('click', function() {
+            document.getElementById('filterInput').value = this.getAttribute('data-value');
+            document.getElementById('filterForm').submit();
+        });
+    });
+</script>
+
+
+</form>
+
+</form>
+</div>
 		<div class="container mt-3">
 			<div class="row row-cols-2 row-cols-md-4 g-4">
 				{% for article in articles %}

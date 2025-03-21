@@ -56,20 +56,17 @@ final class ArticleController extends AbstractController
                     );
                     $article->setImage($newFilename);
                 } catch (FileException $e) {
-                    // Gérer l'erreur si nécessaire
                 }
             }
 
             $entityManager->persist($article);
             $entityManager->flush();
-
-            // 🔹 Gestion de la quantité
             $quantite = $form->get('quantite')->getData();
             if ($quantite > 0) {
                 $stocker = new Stocker();
                 $stocker->setArticle($article);
                 $stocker->setQuantite($quantite);
-                $stocker->setEntrepotId(1); // À adapter selon la logique métier
+                $stocker->setEntrepotId(1);
 
                 $entityManager->persist($stocker);
                 $entityManager->flush();
@@ -81,6 +78,28 @@ final class ArticleController extends AbstractController
         return $this->render('article/new.html.twig', [
             'article' => $article,
             'form' => $form,
+        ]);
+    }
+    #[Route('/filtrer', name: 'app_article_filtered')]
+    public function Filtrer(ArticleRepository $articleRepository, Request $request): Response
+    {
+        $filter = $request->query->get('filter');
+
+        dump($filter);
+
+        switch ($filter) {
+            case 'asc':
+                $articles = $articleRepository->findBy([], ['prix' => 'ASC']);
+                break;
+            case 'desc':
+                $articles = $articleRepository->findBy([], ['prix' => 'DESC']);
+                break;
+            default:
+                $articles = $articleRepository->findAll();
+        }
+
+        return $this->render('article/index.html.twig', [
+            'articles' => $articles,
         ]);
     }
 
