@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Categorie;
 use App\Entity\Stocker;
 use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
+use App\Repository\CategorieRepository;
 use App\Repository\StockerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,19 +20,21 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 final class ArticleController extends AbstractController
 {
     #[Route('/article/admin', name: 'app_article_admin_index', methods: ['GET'])]
-    public function indexadmin(ArticleRepository $articleRepository): Response
+    public function indexadmin(ArticleRepository $articleRepository, CategorieRepository $categorieRepository): Response
     {
         return $this->render('article/articleadmin.html.twig', [
             'articles' => $articleRepository->findAll(),
+            'categories' => $categorieRepository->findAll(),
         ]);
     }
 
 
     #[Route('/', name: 'app_article_index', methods: ['GET'])]
-    public function index(ArticleRepository $articleRepository): Response
+    public function index(ArticleRepository $articleRepository, CategorieRepository $categorieRepository): Response
     {
         return $this->render('article/index.html.twig', [
             'articles' => $articleRepository->findAll(),
+            'categories' => $categorieRepository->findAll(),
         ]);
     }
 
@@ -81,27 +85,38 @@ final class ArticleController extends AbstractController
         ]);
     }
     #[Route('/filtrer', name: 'app_article_filtered')]
-    public function Filtrer(ArticleRepository $articleRepository, Request $request): Response
+    public function Filtrer(ArticleRepository $articleRepository, Request $request, CategorieRepository $categorieRepository): Response
     {
         $filter = $request->query->get('filter');
+        $categoryId = $request->query->get('category');
+        $categoryOrder = $request->query->get('categoryOrder', 'asc'); // Valeur par défaut: asc
 
-        dump($filter);
-
-        switch ($filter) {
-            case 'asc':
-                $articles = $articleRepository->findBy([], ['prix' => 'ASC']);
-                break;
-            case 'desc':
-                $articles = $articleRepository->findBy([], ['prix' => 'DESC']);
-                break;
-            default:
-                $articles = $articleRepository->findAll();
+        $criteria = [];
+        if ($categoryId) {
+            $criteria['categorie'] = $categoryId;
         }
+
+        $orderBy = [];
+        if ($filter === 'asc') {
+            $orderBy['prix'] = 'ASC';
+        } elseif ($filter === 'desc') {
+            $orderBy['prix'] = 'DESC';
+        }
+
+        $articles = $articleRepository->findBy($criteria, $orderBy);
+        $categories = $categorieRepository->createQueryBuilder('c')
+            ->leftJoin('c.articles', 'a')
+            ->groupBy('c.id')
+            ->orderBy('c.libelle', strtoupper($categoryOrder) === 'DESC' ? 'DESC' : 'ASC')
+            ->getQuery()
+            ->getResult();
 
         return $this->render('article/index.html.twig', [
             'articles' => $articles,
+            'categories' => $categories,
         ]);
     }
+
 
     #[Route('/article/search', 'app_search_article', methods: ['POST'])]
     public function searchArticle(ArticleRepository $article, Request $request): Response
@@ -120,6 +135,7 @@ final class ArticleController extends AbstractController
             'query' => $query,
         ]);
     }
+
 
     #[Route('/article/g/{id}', name: 'article_detail')]
     public function show(int $id, ArticleRepository $Article, StockerRepository $stockerRepository): Response

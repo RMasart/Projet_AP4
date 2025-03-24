@@ -20,6 +20,7 @@
                 <img src="{{ asset('images/all4sport.png') }}" alt="Logo All4Sport" class="product-logo">
                 <h3 class="product-title">Détail du produit :</h3>
                 <p><strong>Nom :</strong> {{ article.nom }}</p>
+                <p><strong>Catégorie :</strong> {{ article.categorie ? article.categorie.libelle : 'Non catégorisé' }}</p>
                 <p><strong>Disponible :</strong> {{ article.disponibilite ? 'Oui' : 'Non' }}</p>
                 <p><strong>Prix :</strong> {{ article.prix ? article.prix ~ ' €' : 'Non renseigné' }}</p>
                 <p><strong>Il en reste :</strong> {{ quantite }}</p>

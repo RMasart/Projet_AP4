@@ -25,21 +25,31 @@
 				</nav>
 			</div>
 			<form id="filterForm" method="get" action="{{ path('app_article_filtered') }}">
-    <div class="dropdown">
+    <div class="dropdown d-inline-block me-2">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             Trier par
         </button>
         <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-            <li>
-                <button class="dropdown-item filter-option" type="button" data-value="asc">Prix Croissant</button>
-            </li>
-            <li>
-                <button class="dropdown-item filter-option" type="button" data-value="desc">Prix Décroissant</button>
-            </li>
+            <li><button class="dropdown-item filter-option" type="button" data-value="asc">Prix Croissant</button></li>
+            <li><button class="dropdown-item filter-option" type="button" data-value="desc">Prix Décroissant</button></li>
         </ul>
         <input type="hidden" name="filter" id="filterInput">
     </div>
+
+    <div class="dropdown d-inline-block">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Catégorie
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+            <li><button class="dropdown-item category-option" type="button" data-value="">Toutes les catégories</button></li>
+            {% for category in categories %}
+                <li><button class="dropdown-item category-option" type="button" data-value="{{ category.id }}">{{ category.libelle }}</button></li>
+            {% endfor %}
+        </ul>
+        <input type="hidden" name="category" id="categoryInput">
+    </div>
 </form>
+
 
 <script>
     document.querySelectorAll('.filter-option').forEach(item => {
@@ -48,7 +58,15 @@
             document.getElementById('filterForm').submit();
         });
     });
+
+    document.querySelectorAll('.category-option').forEach(item => {
+        item.addEventListener('click', function() {
+            document.getElementById('categoryInput').value = this.getAttribute('data-value');
+            document.getElementById('filterForm').submit();
+        });
+    });
 </script>
+
 
 
 </form>
@@ -70,6 +88,7 @@
 
 							<div class="card-body">
 								<h5 class="card-title">{{ article.nom }}</h5>
+								 <p>Catégorie : {{ article.categorie ? article.categorie.libelle : 'Non catégorisé' }}</p>
 								<!-- Affichage du prix -->
 								<p class="card-text">{{ article.prix ? article.prix ~ '€' : 'Prix non renseigné' }}</p>
 							</div>

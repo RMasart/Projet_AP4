@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Entity;
 
 use App\Repository\ArticleRepository;
@@ -17,17 +18,20 @@ class Article
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
-    #[ORM\Column(type: 'boolean')] 
+    #[ORM\Column(type: 'boolean')]
     private ?bool $disponibilite = null;
 
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)] 
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
     private ?float $prix = null;
 
-    #[ORM\Column(length: 255, nullable: true)] 
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
     #[ORM\OneToMany(targetEntity: Stocker::class, mappedBy: 'article')]
     private Collection $stockers;
+
+    #[ORM\ManyToOne(inversedBy: 'articles')]
+    private ?Categorie $categorie = null;
 
     public function __construct()
     {
@@ -50,7 +54,7 @@ class Article
         return $this;
     }
 
-    public function isDisponibilite(): ?bool 
+    public function isDisponibilite(): ?bool
     {
         return $this->disponibilite;
     }
@@ -94,6 +98,18 @@ class Article
             $this->stockers->add($stocker);
             $stocker->setArticle($this);
         }
+        return $this;
+    }
+
+    public function getCategorie(): ?Categorie
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(?Categorie $categorie): static
+    {
+        $this->categorie = $categorie;
+
         return $this;
     }
 }

@@ -10,6 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints\File;
 
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Categorie;
+
 class ArticleType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,6 +38,12 @@ class ArticleType extends AbstractType
                 'label' => 'Quantité en stock',
                 'required' => false,
                 'data' => $options['quantite'] ?? 0,
+            ])
+            ->add('categorie', EntityType::class, [  // 🔹 Ajout du champ catégorie
+                'class' => Categorie::class,
+                'choice_label' => 'libelle', // Affichage du nom de la catégorie
+                'placeholder' => 'Choisissez une catégorie',
+                'required' => false, // Optionnel
             ]);
     }
 
