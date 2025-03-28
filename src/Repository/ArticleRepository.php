@@ -16,6 +16,19 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
+    public function searchByQuery(string $query): array
+    {
+        if (empty($query)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('a')
+            ->where('a.nom LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Article[] Returns an array of Article objects
     //     */
@@ -33,11 +46,11 @@ class ArticleRepository extends ServiceEntityRepository
 
     //    public function findOneBySomeField($value): ?Article
     //    {
-    //        return $this->createQueryBuilder('a')
+    //      return $this->createQueryBuilder('a')
     //            ->andWhere('a.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()
-    //        ;
+    //        ;  
     //    }
 }

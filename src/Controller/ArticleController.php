@@ -33,7 +33,7 @@ final class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // 🔹 Gestion de l'image
+
             /** @var UploadedFile $imageFile */
             $imageFile = $form->get('image')->getData();
 
@@ -54,18 +54,6 @@ final class ArticleController extends AbstractController
             $entityManager->persist($article);
             $entityManager->flush();
 
-            // 🔹 Gestion de la quantité
-            $quantite = $form->get('quantite')->getData();
-            if ($quantite > 0) {
-                $stocker = new Stocker();
-                $stocker->setArticle($article);
-                $stocker->setQuantite($quantite);
-                $stocker->setEntrepotId(1); // À adapter selon la logique métier
-
-                $entityManager->persist($stocker);
-                $entityManager->flush();
-            }
-
             return $this->redirectToRoute('app_article_index');
         }
 
@@ -75,13 +63,32 @@ final class ArticleController extends AbstractController
         ]);
     }
 
-    #[Route('/article/{id}', name: 'article_detail', methods: ['GET'])]
-    public function show(int $id, ArticleRepository $articleRepository, StockerRepository $stockerRepository): Response
+    #[Route('/article/search', 'app_search_article', methods: ['POST'])]
+    public function searchArticle(ArticleRepository $article, Request $request): Response
     {
-        $article = $articleRepository->find($id);
 
-        if (!$article) {
-            throw $this->createNotFoundException("L'article n'existe pas.");
+        $query = $request->request->get('s', '');
+
+        if (empty($query)) {
+            return $this->redirectToRoute('app_article_index');
+        }
+
+        $articles = $article->searchByQuery($query);
+
+        return $this->render('article/search.html.twig', [
+            'articles' => $articles,
+            'query' => $query,
+        ]);
+
+    }
+
+    #[Route('/article/g/{id}', name: 'article_detail')]
+    public function show(int $id, ArticleRepository $Article, StockerRepository $stockerRepository): Response
+    {
+        $article = $Article->find($id);
+
+        if (!isset($articles)) {
+            throw $this->createNotFoundException("l'article n'existe pas");
         }
 
         // 🔹 Récupérer la quantité en stock
@@ -94,8 +101,7 @@ final class ArticleController extends AbstractController
         ]);
     }
 
-
-    #[Route('/article/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
+    #[Route('/article/edit/{id}', name: 'app_article_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
         Article $article,
@@ -155,7 +161,6 @@ final class ArticleController extends AbstractController
             'quantite' => $quantite,
         ]);
     }
-
 
     #[Route('/article/delete/{id}', name: 'app_article_delete', methods: ['POST'])]
     public function delete(Request $request, Article $article, EntityManagerInterface $entityManager): Response

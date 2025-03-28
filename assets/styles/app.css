@@ -6,13 +6,6 @@
     margin-right: 5vw;
 }
 
-.search-input {
-    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16"%3E%3Cpath d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/%3E%3C/svg%3E');
-    background-position: right 10px center;
-    background-repeat: no-repeat;
-    padding-right: 30px;
-}
-
 .check-icon {
     display: none;
     margin-right: 5px;
@@ -68,4 +61,60 @@
 
 .btn-add-cart:hover {
     background-color: darkred;
+}
+
+.button_size {
+    width: 10vw;
+}
+
+
+.active-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+}
+
+.search-input {
+    flex-grow: 1;
+    border: none;
+    padding: 10px;
+    outline: none;
+    padding-right: 35px;
+    /* Pour éviter que le texte passe sous l'icône */
+}
+
+.search-btn {
+    border: none;
+    background: none;
+    /* Pas de background */
+    padding: 5px 10px;
+    position: absolute;
+    right: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: #6c757d;
+    /* Couleur par défaut */
+}
+
+.search-btn:hover svg {
+    fill: #000;
+    /* Changement de couleur au survol */
 }
