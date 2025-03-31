@@ -6,7 +6,7 @@
 <div class="container">
     <h2 class="text-center mt-4">Historique d'achat</h2>
     <div class="row">
-        {% for commande in commandes %}
+        {% for achat in achats %}
         <div class="col-md-3">
             <div class="card">
                 <img src="{{ commande.article.image }}" class="card-img-top" alt="{{ commande.article.nom }}">

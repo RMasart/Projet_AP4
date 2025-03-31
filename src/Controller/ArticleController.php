@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class ArticleController extends AbstractController
 {
@@ -109,15 +110,19 @@ final class ArticleController extends AbstractController
 
         if (!$article) {
             throw $this->createNotFoundException("l'article n'existe pas");
+        } else {
+            // 🔹 Récupérer la quantité en stock
+            $stock = $stockerRepository->findOneBy(['article' => $article]);
+            $quantite = $stock ? $stock->getQuantite() : 0; // Par défaut, 0 si non trouvé
+            return $this->render('article/show.html.twig', [
+                'article' => $article,
+                'quantite' => $quantite, // Passer la quantité au template
+            ]);
         }
 
-        // 🔹 Récupérer la quantité en stock
-        $stock = $stockerRepository->findOneBy(['article' => $article]);
-        $quantite = $stock ? $stock->getQuantite() : 0; // Par défaut, 0 si non trouvé
-        return $this->render('article/show.html.twig', [
-            'article' => $article,
-            'quantite' => $quantite, // Passer la quantité au template
-        ]);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // faut pas laisser son pc débloqué
+        }
     }
 
 
@@ -182,15 +187,31 @@ final class ArticleController extends AbstractController
         ]);
     }
 
-
-    #[Route('/article/delete/{id}', name: 'app_article_delete', methods: ['POST'])]
-    public function delete(Request $request, Article $article, EntityManagerInterface $entityManager): Response
+    #[Route('/article/ajouter/{id}', name: 'app_article_ajouter', methods: ['POST'])]
+    public function AjouterArticle($id, Request $request, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete' . $article->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($article);
-            $entityManager->flush();
+        $session = $request->getSession();
+        $panier = $session->get('panier', []);
+        if (!in_array($id, $panier)) {
+            $panier[] = $id;
+            $session->set('panier', $panier);
         }
 
-        return $this->redirectToRoute('app_article_index', [], Response::HTTP_SEE_OTHER);
+        $articles = $entityManager->getRepository(ArticleController::class)->findBy(['id' => $panier]);
+
+        $this->addFlash('success', 'Article ajouté au panier');
+        return $this->redirectToRoute('app_mon_panier');
+    }
+
+
+    #[Route('/article/supprimer/{id}', name: 'app_article_supprimer', methods: ['POST'])]
+    public function SupprimerArticle($id, SessionInterface $session)
+    {
+        $panier = $session->get('panier', []);
+        if (($key = array_search($id, $panier)) !== false) {
+            unset($panier[$key]);
+        }
+        $session->set('panier', $panier);
+        return $this->redirectToRoute('app_mon_panier');
     }
 }

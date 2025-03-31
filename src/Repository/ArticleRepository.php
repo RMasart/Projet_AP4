@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Article;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @extends ServiceEntityRepository<Article>
@@ -27,6 +29,26 @@ class ArticleRepository extends ServiceEntityRepository
             ->setParameter('query', '%' . $query . '%')
             ->getQuery()
             ->getResult();
+    }
+
+    public function index (Request $request, ArticleRepository $articleRepository): Response
+    {
+       $session = $request->getSession();
+       $panier = $session->get('panier', []);
+       $articleId = $request->query->get('articleId');
+
+       if ($articleId !== null) {
+        $article = $articleRepository->find($articleId);
+        if ($article && !in_array($articleId, $panier)) {
+            $panier[] = $articleId;
+        }
+       }
+
+       $articles = $articleRepository->findBy(['id' => $panier]);
+       return $this->render('mon_panier/index.html.twig', [
+           'controller_name' => 'MonPanierController',
+           'articles' => $articles,
+       ]);
     }
 
     //    /**

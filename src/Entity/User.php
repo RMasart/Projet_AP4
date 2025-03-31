@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,13 +22,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
+     * @var list<string> Les rôles de l'utilisateur
      */
     #[ORM\Column]
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var string Le mot de passe haché
      */
     #[ORM\Column]
     private ?string $password = null;
@@ -42,6 +44,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $telephone = null;
+
+    /**
+     * @var Collection|Achat[]
+     * @ORM\OneToMany(targetEntity="App\Entity\Achat", mappedBy="user")
+     */
+    private $achats;
+
+    public function __construct()
+    {
+        $this->achats = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -61,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
+     * Un identifiant visuel qui représente cet utilisateur.
      *
      * @see UserInterface
      */
@@ -78,7 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
+        // garantir que chaque utilisateur a au moins ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -114,8 +127,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        
     }
 
     public function getPrenom(): ?string
@@ -127,10 +139,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->prenom = $prenom;
 
-
         return $this;
     }
-
 
     public function getNom(): ?string
     {
@@ -140,7 +150,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
 
         return $this;
     }
@@ -165,6 +174,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTelephone(string $telephone): static
     {
         $this->telephone = $telephone;
+
+        return $this;
+    }
+
+    /**
+     * Récupère les achats de l'utilisateur.
+     *
+     * @return Collection|Achat[]
+     */
+    public function getAchats(): Collection
+    {
+        return $this->achats;
+    }
+
+    public function addAchat(Achat $achat): static
+    {
+        if (!$this->achats->contains($achat)) {
+            $this->achats->add($achat);
+            $achat->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAchat(Achat $achat): static
+    {
+        if ($this->achats->removeElement($achat)) {
+            // définit le côté propriétaire à null (sauf si déjà modifié)
+            if ($achat->getUser() === $this) {
+                $achat->setUser(null);
+            }
+        }
 
         return $this;
     }

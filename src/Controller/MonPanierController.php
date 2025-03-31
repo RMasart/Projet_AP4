@@ -2,61 +2,93 @@
 
 namespace App\Controller;
 
+use App\Entity\Achat;
+use App\Repository\ArticleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class MonPanierController extends AbstractController
 {
     #[Route('/mon_panier', name: 'app_mon_panier')]
-    public function index(): Response
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
-        
+        $session = $request->getSession();
+        $panier = $session->get('panier', []);
 
-        $articles = []; // Define and assign a value to $articles
+        // Récupérer les articles correspondants depuis la base de données
+        $articles = [];
+        if (!empty($panier)) {
+            $articles = $entityManager->getRepository(ArticleController::class)->findBy(['id' => $panier]);
+        }
 
         return $this->render('mon_panier/index.html.twig', [
             'controller_name' => 'MonPanierController',
-            'articles' => $articles, // Passe les données des articles au template index.html.twig
+            'articles' => $articles, // On passe bien la variable articles au template
         ]);
     }
 
-    #[Route('/mon_panier/supprimer/{id}', name: 'app_supprimer_article')]
-    public function supprimerArticle($id, SessionInterface $session)
-    {
-        $panier = $session->get('panier', []);
-        if (isset($panier[$id])) {
-            unset($panier[$id]);
-        }
-        $session->set('panier', $panier);
-        return $this->redirectToRoute('app_panier');
-    }
 
     #[Route('/mon_panier/confirmation', name: 'app_confirmation_panier')]
-    public function confirmation(): Response
+    public function confirmationPanier(SessionInterface $session, ArticleRepository $articleRepository, EntityManagerInterface $entityManager): Response
     {
+        $panier = $session->get('panier', []);
+        $articles = $articleRepository->findBy(['id' => $panier]);
+
+        if (empty($articles)) {
+            $this->addFlash('error', 'Votre panier est vide.');
+            return $this->redirectToRoute('app_mon_panier');
+        }
+
+        // Calculer le total
+        $total = array_reduce($articles, function ($sum, $article) {
+            return $sum + $article->getPrix();
+        }, 0);
+
+        // Créer un nouvel achat
+        $achat = new Achat();
+        $achat->setDateAchat(new \DateTime());
+        $achat->setTotal($total);
+
+        foreach ($articles as $article) {
+            $achat->addArticle($article);
+        }
+
+        $user = $this->getUser();
+        if ($user) {
+            $achat->setUser($user);
+        }
+
+        $entityManager->persist($achat);
+        $entityManager->flush();
+
+        // Vider le panier après la confirmation
+        $session->set('panier', []);
+
+        $this->addFlash('success', 'Votre commande a été confirmée.');
+
         return $this->render('mon_panier/confirmation.html.twig', [
-            'controller_name' => 'MonPanierController',
+            'articles' => $articles,
+            'total' => $total,
         ]);
     }
 
-    public function confirm(): Response
+    #[Route('/historique', name: 'app_historique')]
+   
+    public function historique(SessionInterface $session, EntityManagerInterface $entityManager): Response
     {
-        return $this->redirectToRoute('app_confirmation_panier');
-    }
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
 
-    #[Route('/panier', name: 'panier')]
-    public function panier(Request $request): Response
-    {
-        $produits = $request->request->get('produits', null);
-        $quantites = $request->request->get('quantites', null);
+        $achats = $entityManager->getRepository(Achat::class)->findBy(['user' => $user]);
 
-
-        return $this->render('panier/index.html.twig', [
-            'produits' => $produits,
-            'quantites' => $quantites,
+        return $this->render('historique/index.html.twig', [
+            'achats' => $achats,
         ]);
     }
 }

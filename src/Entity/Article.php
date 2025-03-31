@@ -29,9 +29,19 @@ class Article
     #[ORM\OneToMany(targetEntity: Stocker::class, mappedBy: 'article')]
     private Collection $stockers;
 
+    /**
+     * @var Collection<int, Achat>
+     */
+    #[ORM\ManyToMany(targetEntity: Achat::class, mappedBy: 'articles')]
+    private Collection $achats;
+
+
+  
+
     public function __construct()
     {
         $this->stockers = new ArrayCollection();
+        $this->achats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -96,4 +106,33 @@ class Article
         }
         return $this;
     }
+
+    /**
+     * @return Collection<int, Achat>
+     */
+    public function getAchats(): Collection
+    {
+        return $this->achats;
+    }
+
+    public function addAchat(Achat $achat): static
+    {
+        if (!$this->achats->contains($achat)) {
+            $this->achats->add($achat);
+            $achat->addArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAchat(Achat $achat): static
+    {
+        if ($this->achats->removeElement($achat)) {
+            $achat->removeArticle($this);
+        }
+
+        return $this;
+    }
+
+    
 }
